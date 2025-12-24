@@ -15,14 +15,11 @@ class AuthProvider extends ChangeNotifier {
   AuthState get state => _state;
   String get errorMessage => _errorMessage;
 
-  // ✅ SOLUSI FINAL: KITA PAKAI ALAMAT LENGKAP YANG ADA DI BROWSER KAMU
-  // Tidak perlu dipisah-pisah lagi biar tidak salah sambung.
   final String _mainUrl = 'https://694aa42826e8707720662769.mockapi.io/users';
 
   final Dio _dio = Dio();
 
   AuthProvider() {
-    // Setup timeout biar ga loading selamanya kalau internet lemot
     _dio.options.connectTimeout = const Duration(seconds: 10);
     _dio.options.receiveTimeout = const Duration(seconds: 10);
   }
@@ -33,7 +30,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Langsung tembak ke alamat lengkap
       final response = await _dio.get(
         _mainUrl,
         queryParameters: {'email': email},
@@ -73,7 +69,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 1. Cek Email (Gunakan URL Lengkap)
       final checkResponse = await _dio.get(
         _mainUrl,
         queryParameters: {'email': email},
@@ -84,7 +79,6 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
 
-      // 2. Register User Baru (Gunakan URL Lengkap)
       final response = await _dio.post(
         _mainUrl,
         data: {
@@ -115,7 +109,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// UPDATE PROFILE
   Future<bool> updateProfile({
     required String name,
     String? phone,
@@ -128,9 +121,6 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final id = _currentUser!.id;
-
-      // Untuk update, kita tambahkan ID di belakang URL utama
-      // Hasilnya: https://...mockapi.io/users/1
       final response = await _dio.put(
         '$_mainUrl/$id',
         data: {
@@ -158,8 +148,7 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
-  
-  /// RESET PASSWORD
+
   Future<bool> resetPassword(String email) async {
     _state = AuthState.loading;
     notifyListeners();
@@ -195,8 +184,6 @@ class AuthProvider extends ChangeNotifier {
   void _handleDioError(DioException e) {
     String msg = 'Terjadi kesalahan jaringan.';
     if (e.type == DioExceptionType.badResponse) {
-       // Jika 404 muncul di sini, berarti ID project MockAPI mungkin berubah/terhapus,
-       // TAPI karena kita pakai URL hardcode dari browser, harusnya AMAN.
        msg = 'Error Server: ${e.response?.statusCode}';
     } else if (e.type == DioExceptionType.connectionError) {
        msg = 'Tidak ada koneksi internet.';

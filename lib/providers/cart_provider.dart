@@ -8,7 +8,6 @@ class CartProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
   final List<CartItemModel> _items = [];
   
-  // --- LOGIKA DISKON ---
   double _discountAmount = 0;
   String? _appliedCoupon;
 
@@ -21,17 +20,12 @@ class CartProvider extends ChangeNotifier {
   List<CartItemModel> get items => _items;
   String? get appliedCoupon => _appliedCoupon;
   double get discountAmount => _discountAmount;
-
-  // Total Harga Barang (Sebelum Diskon)
   double get subtotal => _items.fold(0, (sum, item) => sum + item.subtotal);
-
-  // Total Akhir (Setelah Diskon)
   double get totalAmount => subtotal - _discountAmount;
 
   int get itemCount => _items.fold(0, (sum, item) => sum + item.quantity);
   bool get isEmpty => _items.isEmpty;
 
-  // ========== Persistence ===========
   void _loadCartFromPrefs() {
     final raw = _prefs.getString(_prefsKey);
     if (raw != null) {
@@ -51,7 +45,6 @@ class CartProvider extends ChangeNotifier {
     await _prefs.setString(_prefsKey, encoded);
   }
 
-  // ========== CART OPERATIONS ===========
   void addToCart(ProductModel product, {int quantity = 1, String? notes}) {
     final index = _items.indexWhere((i) => i.product.id == product.id);
     if (index >= 0) {
@@ -94,24 +87,22 @@ class CartProvider extends ChangeNotifier {
   // --- FITUR APPLY KUPON ---
   bool applyCoupon(String code) {
     if (code.toUpperCase() == 'DISKON50') {
-      _discountAmount = subtotal * 0.5; // Diskon 50%
+      _discountAmount = subtotal * 0.5; 
       _appliedCoupon = 'DISKON50';
       notifyListeners();
       return true;
     } else if (code.toUpperCase() == 'HEMAT10') {
-      _discountAmount = 10000; // Potongan Rp 10.000 fix
+      _discountAmount = 10000; 
       _appliedCoupon = 'HEMAT10';
       notifyListeners();
       return true;
     } else if (code.toUpperCase() == 'FREEONGKIR') {
-      // Logika free ongkir biasanya di handle terpisah, 
-      // tapi disini kita anggap potongan 2000 (biaya admin/ongkir)
       _discountAmount = 2000; 
       _appliedCoupon = 'FREEONGKIR';
       notifyListeners();
       return true;
     }
-    return false; // Kupon tidak valid
+    return false;
   }
 
   void removeCoupon() {

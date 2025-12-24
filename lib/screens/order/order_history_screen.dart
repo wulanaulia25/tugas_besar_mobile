@@ -20,9 +20,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final orderProvider = Provider.of<OrderProvider>(context, listen: false);
-      
-      // Cek: Jika orders kosong, baru fetch dari server.
-      // Jika sudah ada isinya (baru checkout), jangan fetch ulang biar data lengkapnya gak ketimpa data jelek dari server.
       if (authProvider.currentUser != null && orderProvider.orders.isEmpty) {
         orderProvider.fetchOrders(authProvider.currentUser!.id);
       }
@@ -98,7 +95,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Items tidak akan 0 lagi
                             Text('${order.items.length} Barang'),
                             Text(
                               CurrencyFormatter.format(order.totalAmount),

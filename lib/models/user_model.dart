@@ -4,7 +4,6 @@ class UserModel {
   final String email;
   final String? address;
   final String? phone;
-  // Password tidak disimpan di model demi keamanan state aplikasi
 
   UserModel({
     required this.id,

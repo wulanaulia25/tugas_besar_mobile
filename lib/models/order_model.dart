@@ -87,7 +87,6 @@ class OrderModel {
       id: json['id']?.toString() ?? '',
       userId: json['userId']?.toString() ?? '',
       items: parsedItems,
-      // Jika totalAmount dari API null/0, biarkan 0 (nanti diurus provider)
       totalAmount: (json['totalAmount'] as num?)?.toDouble() ?? 
                    (json['total_amount'] as num?)?.toDouble() ?? 0.0,
       paymentMethod: json['paymentMethod']?.toString() ?? 'Cash on Delivery',
