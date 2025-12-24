@@ -2,95 +2,103 @@
 
 **Storely** merupakan aplikasi *mobile commerce* yang dirancang untuk menghadirkan pengalaman belanja daring yang efisien, responsif, dan intuitif. Dibangun di atas ekosistem **Flutter**, aplikasi ini mensimulasikan alur transaksi *e-commerce* secara menyeluruh, mulai dari eksplorasi katalog produk multi-kategori, manajemen keranjang belanja pintar, hingga simulasi pembayaran digital.
 
-Proyek ini dikembangkan sebagai bentuk pemenuhan Tugas Besar untuk mata kuliah **Pemrograman Mobile** di Politeknik Negeri Indramayu.
+Proyek ini kami kembangkan sebagai bentuk pemenuhan **Tugas Besar Mata Kuliah Pemrograman Mobile** di **Politeknik Negeri Indramayu**.
+
+---
 
 ## 🌟 Fitur Unggulan
 
 Aplikasi ini mengintegrasikan berbagai modul fungsional untuk menunjang pengalaman pengguna:
 
-* **Sistem Autentikasi:** Implementasi registrasi dan login pengguna yang aman, terintegrasi dengan layanan *mock backend* (MockAPI).
-* **Katalog Produk Dinamis:** Menampilkan ragam produk (Elektronik, Fashion, Aksesoris) yang diambil secara *real-time* melalui integrasi API publik (FakeStoreAPI).
-* **Pencarian & Filterisasi:** Fitur pencarian cerdas yang memudahkan pengguna menelusuri produk berdasarkan kata kunci atau kategori spesifik.
-* **Detail Produk Komprehensif:** Visualisasi produk dengan resolusi tinggi, dilengkapi deskripsi mendalam dan ulasan rating.
-* **Manajemen Keranjang Belanja:** Fleksibilitas dalam menambah, mengurangi, atau menghapus item, serta kalkulasi subtotal otomatis.
-* **Logika Promosi & Voucher:** Penerapan kode diskon (contoh: `DISKON50`, `HEMAT10`, `FREEONGKIR`) untuk simulasi pemotongan harga.
-* **Simulasi Checkout:** Antarmuka pembayaran yang lengkap dengan validasi alamat pengiriman dan pemilihan metode bayar.
-* **Pelacakan Status Pesanan:** Visualisasi alur pesanan pengguna dari tahap pemrosesan sistem hingga pengiriman selesai.
-* **Adaptabilitas Tema (Dark Mode):** Dukungan antarmuka responsif yang menyesuaikan preferensi tema perangkat (Gelap/Terang).
-* **Personalisasi Profil:** Modul untuk pengelolaan data diri dan pengaturan aplikasi.
+- **Sistem Autentikasi**  
+  Registrasi dan login pengguna yang terintegrasi dengan *mock backend* (MockAPI)
 
-## 🛠️ Arsitektur & Pustaka (Tech Stack)
+- **Katalog Produk Dinamis**  
+  Produk multi-kategori (Elektronik, Fashion, Aksesoris) dari FakeStoreAPI
 
-Aplikasi ini dibangun dengan prinsip *Clean Architecture* menggunakan pustaka-pustaka berikut:
+- **Pencarian & Filterisasi**  
+  Pencarian produk berdasarkan kata kunci dan kategori
 
-* **Framework:** Flutter SDK
-* **Bahasa Pemrograman:** Dart
-* **Manajemen State:** `provider` (^6.1.1) - Untuk pengelolaan data aplikasi yang reaktif.
-* **Jaringan (Networking):** `dio` (^5.4.0) - Menangani permintaan HTTP dengan konfigurasi interceptor.
-* **Navigasi:** `go_router` (^13.0.0) - Manajemen rute berbasis deklaratif.
-* **Penyimpanan Lokal:** `shared_preferences` (^2.2.2) - Persistensi data sesi dan preferensi pengguna.
-* **Komponen UI:** `google_fonts` (Tipografi), `cached_network_image` (Optimasi gambar), `intl` (Format mata uang).
+- **Detail Produk Komprehensif**  
+  Gambar resolusi tinggi, deskripsi produk, harga, dan rating
+
+- **Manajemen Keranjang Belanja**  
+  Tambah, kurangi, hapus item dengan perhitungan subtotal otomatis
+
+- **Logika Promosi & Voucher**  
+  Simulasi diskon menggunakan kode seperti `DISKON50`, `HEMAT10`, `FREEONGKIR`
+
+- **Simulasi Checkout**  
+  Validasi alamat pengiriman dan pemilihan metode pembayaran
+
+- **Pelacakan Status Pesanan**  
+  Monitoring status pesanan dari proses hingga selesai
+
+- **Adaptabilitas Tema (Dark Mode)**  
+  Antarmuka menyesuaikan tema sistem (gelap/terang)
+
+- **Personalisasi Profil**  
+  Pengelolaan data akun dan pengaturan aplikasi
+
+---
+
+## 🛠️ Arsitektur & Tech Stack
+
+Aplikasi ini dibangun menggunakan prinsip **Clean Architecture** dengan teknologi berikut:
+
+- **Framework:** Flutter SDK  
+- **Bahasa Pemrograman:** Dart  
+- **State Management:** `provider` (^6.1.1)  
+- **Networking:** `dio` (^5.4.0)  
+- **Navigasi:** `go_router` (^13.0.0)  
+- **Local Storage:** `shared_preferences` (^2.2.2)  
+- **UI Utilities:** `google_fonts`, `cached_network_image`, `intl`
+
+---
 
 ## ⚙️ Panduan Instalasi (Setup)
 
-Ikuti langkah-langkah berikut untuk menyiapkan lingkungan pengembangan lokal:
-
-1.  **Kloning Repositori**
-    Pastikan Git telah terinstal, kemudian unduh kode sumber proyek:
-    ```bash
-    git clone [https://github.com/username-anda/storely-app.git](https://github.com/username-anda/storely-app.git)
-    cd storely-app
-    ```
-
-2.  **Instalasi Dependensi**
-    Unduh seluruh paket pustaka yang diperlukan oleh proyek:
-    ```bash
-    flutter pub get
-    ```
-
-3.  **Konfigurasi Environment**
-    Secara *default*, aplikasi telah terkonfigurasi untuk menggunakan:
-    * **Produk API:** `https://fakestoreapi.com` (Publik)
-    * **User API:** MockAPI (Telah diatur pada `auth_provider.dart`)
-
-## ▶️ Instruksi Menjalankan (Run)
-
-Pastikan Emulator Android telah berjalan atau perangkat fisik terhubung melalui mode *USB Debugging*.
-
-Jalankan perintah berikut untuk mode pengembangan (*Debug*):
+### 1. Kloning Repository
 ```bash
+git clone https://github.com/username-anda/storely-app.git
+cd storely-app
+
+2. Instalasi Dependensi
+flutter pub get
+3. Konfigurasi Environment
+Secara default aplikasi menggunakan:
+
+Produk API: https://fakestoreapi.com
+
+User API: MockAPI (dikonfigurasi pada auth_provider.dart)
+
+▶️ Menjalankan Aplikasi
+Pastikan emulator Android aktif atau perangkat fisik terhubung melalui USB Debugging.
+
 flutter run
+📦 Build APK (Release)
+Untuk menghasilkan file APK:
 
-## 📦 Cara Build (Export APK)
+flutter build apk --release
+File akan tersedia di:
 
-Untuk membuat file `.apk` yang bisa diinstall di HP Android:
+build/app/outputs/flutter-apk/app-release.apk
+🔑 Akun Demo
+Anda dapat mendaftar akun baru, atau menggunakan akun demo berikut:
 
-1.  Jalankan perintah build:
-    ```bash
-    flutter build apk --release
-    ```
-2.  File APK akan muncul di:
-    `build/app/outputs/flutter-apk/app-release.apk`
+Email: umam@gmail.com
 
-## 🔑 Informasi Akun Demo
+Password: 123456
 
-Anda bisa mendaftar akun baru di aplikasi, atau gunakan akun demo berikut (jika tersedia di MockAPI):
-* **Email:** `umam@gmail.com`
-* **Password:** `123456`
+👥 Tim Pengembang
+Program Studi D4 Rekayasa Perangkat Lunak
+Politeknik Negeri Indramayu — Kelas 2B
 
-**Ketua Tim / Developer Utama:**
-* **Nama:** Khoirul Umam
-* **NIM:** 2405029
-* **Kelas:** RPL - 2B
-* **Institusi:** Politeknik Negeri Indramayu (Polindra)
+Nama	NIM	Peran
+Khoirul Umam	2405029	Ketua Tim / Lead Developer
+Wulan Aulia	2405067	UI/UX Designer & Frontend Developer
+Nela Farokh Rahmayanti	2405007	Frontend Developer & Quality Assurance
 
-* **Nama:** Wulan Aulia
-* **NIM:** 2405067
-* **Kelas:** RPL - 2B
-* **Institusi:** Politeknik Negeri Indramayu (Polindra)
-
-* **Nama:** Nela Farokh Rahmayanti
-* **NIM:** 2405007
-* **Kelas:** RPL - 2B
-* **Institusi:** Politeknik Negeri Indramayu (Polindra)
-
+📄 Penutup
+© 2025 Storely App
+Dikembangkan untuk keperluan akademik menggunakan Flutter.
