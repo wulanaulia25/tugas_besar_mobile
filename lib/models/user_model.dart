@@ -2,8 +2,9 @@ class UserModel {
   final String id;
   final String name;
   final String email;
-  final String? address; // opsional, bisa null
-  final String? phone;   // tambah phone supaya sesuai edit profile
+  final String? address;
+  final String? phone;
+  // Password tidak disimpan di model demi keamanan state aplikasi
 
   UserModel({
     required this.id,
@@ -13,10 +14,9 @@ class UserModel {
     this.phone,
   });
 
-  /// Membuat instance UserModel dari JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id']?.toString() ?? '', // pastikan id menjadi String
+      id: json['id']?.toString() ?? '', 
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       address: json['address']?.toString(),
@@ -24,7 +24,6 @@ class UserModel {
     );
   }
 
-  /// Mengubah UserModel menjadi JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -35,7 +34,6 @@ class UserModel {
     };
   }
 
-  /// Salin UserModel dengan update beberapa field (opsional)
   UserModel copyWith({
     String? id,
     String? name,
@@ -51,28 +49,4 @@ class UserModel {
       phone: phone ?? this.phone,
     );
   }
-
-  @override
-  String toString() {
-    return 'UserModel(id: $id, name: $name, email: $email, address: $address, phone: $phone)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is UserModel &&
-        other.id == id &&
-        other.name == name &&
-        other.email == email &&
-        other.address == address &&
-        other.phone == phone;
-  }
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      email.hashCode ^
-      (address?.hashCode ?? 0) ^
-      (phone?.hashCode ?? 0);
 }

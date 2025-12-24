@@ -1,105 +1,122 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 import '../models/cart_item_model.dart';
 import '../models/product_model.dart';
 
 class CartProvider extends ChangeNotifier {
   final SharedPreferences _prefs;
-  List<CartItemModel> _items = [];
+  final List<CartItemModel> _items = [];
+  
+  // --- LOGIKA DISKON ---
+  double _discountAmount = 0;
+  String? _appliedCoupon;
 
-  static const String _keyCart = 'cart_items';
+  static const String _prefsKey = 'cart_items';
 
   CartProvider(this._prefs) {
-    _initCart();
-  }
-
-  Future<void> _initCart() async {
-    await _loadCartFromPrefs();
+    _loadCartFromPrefs();
   }
 
   List<CartItemModel> get items => _items;
+  String? get appliedCoupon => _appliedCoupon;
+  double get discountAmount => _discountAmount;
+
+  // Total Harga Barang (Sebelum Diskon)
+  double get subtotal => _items.fold(0, (sum, item) => sum + item.subtotal);
+
+  // Total Akhir (Setelah Diskon)
+  double get totalAmount => subtotal - _discountAmount;
+
   int get itemCount => _items.fold(0, (sum, item) => sum + item.quantity);
-  double get totalAmount => _items.fold(0, (sum, item) => sum + item.subtotal);
   bool get isEmpty => _items.isEmpty;
 
-  Future<void> _loadCartFromPrefs() async {
-    try {
-      final cartData = _prefs.getString(_keyCart);
-      if (cartData != null) {
-        final List<dynamic> decoded = json.decode(cartData);
-        _items = decoded.map((item) => CartItemModel.fromJson(item)).toList();
+  // ========== Persistence ===========
+  void _loadCartFromPrefs() {
+    final raw = _prefs.getString(_prefsKey);
+    if (raw != null) {
+      try {
+        final List decoded = jsonDecode(raw);
+        _items.clear();
+        _items.addAll(decoded.map((e) => CartItemModel.fromJson(Map<String, dynamic>.from(e))).toList());
         notifyListeners();
+      } catch (e) {
+        // ignore parsing errors
       }
-    } catch (e) {
-      debugPrint('Error loading cart: $e');
     }
   }
 
   Future<void> _saveCartToPrefs() async {
-    try {
-      final encoded = json.encode(_items.map((item) => item.toJson()).toList());
-      await _prefs.setString(_keyCart, encoded);
-    } catch (e) {
-      debugPrint('Error saving cart: $e');
-    }
+    final encoded = jsonEncode(_items.map((e) => e.toJson()).toList());
+    await _prefs.setString(_prefsKey, encoded);
   }
 
-  void _updateCart(VoidCallback update) {
-    update();
+  // ========== CART OPERATIONS ===========
+  void addToCart(ProductModel product, {int quantity = 1, String? notes}) {
+    final index = _items.indexWhere((i) => i.product.id == product.id);
+    if (index >= 0) {
+      _items[index].quantity += quantity;
+      if (notes != null) _items[index].notes = notes;
+    } else {
+      _items.add(CartItemModel(product: product, quantity: quantity, notes: notes));
+    }
     _saveCartToPrefs();
     notifyListeners();
   }
 
-  void addToCart(ProductModel product, {int quantity = 1, String? notes}) {
-    _updateCart(() {
-      final existingIndex = _items.indexWhere((item) => item.product.id == product.id);
-      if (existingIndex != -1) {
-        _items[existingIndex].quantity += quantity;
-      } else {
-        _items.add(CartItemModel(
-          product: product,
-          quantity: quantity,
-          notes: notes,
-        ));
-      }
-    });
-  }
+  bool isInCart(int productId) => _items.any((i) => i.product.id == productId);
 
   void removeFromCart(int productId) {
-    _updateCart(() {
-      _items.removeWhere((item) => item.product.id == productId);
-    });
+    _items.removeWhere((i) => i.product.id == productId);
+    _saveCartToPrefs();
+    notifyListeners();
   }
 
-  void updateQuantity(int productId, int quantity) {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    _updateCart(() {
-      final index = _items.indexWhere((item) => item.product.id == productId);
-      if (index != -1) {
-        _items[index].quantity = quantity;
+  void updateQuantity(int productId, int newQty) {
+    final index = _items.indexWhere((i) => i.product.id == productId);
+    if (index >= 0) {
+      if (newQty <= 0) {
+        _items.removeAt(index);
+      } else {
+        _items[index].quantity = newQty;
       }
-    });
+      _saveCartToPrefs();
+      notifyListeners();
+    }
   }
 
   void clearCart() {
-    _updateCart(() {
-      _items.clear();
-    });
+    _items.clear();
+    _saveCartToPrefs();
+    notifyListeners();
   }
 
-  CartItemModel? getItem(int productId) {
-    try {
-      return _items.firstWhere((item) => item.product.id == productId);
-    } catch (e) {
-      return null;
+  // --- FITUR APPLY KUPON ---
+  bool applyCoupon(String code) {
+    if (code.toUpperCase() == 'DISKON50') {
+      _discountAmount = subtotal * 0.5; // Diskon 50%
+      _appliedCoupon = 'DISKON50';
+      notifyListeners();
+      return true;
+    } else if (code.toUpperCase() == 'HEMAT10') {
+      _discountAmount = 10000; // Potongan Rp 10.000 fix
+      _appliedCoupon = 'HEMAT10';
+      notifyListeners();
+      return true;
+    } else if (code.toUpperCase() == 'FREEONGKIR') {
+      // Logika free ongkir biasanya di handle terpisah, 
+      // tapi disini kita anggap potongan 2000 (biaya admin/ongkir)
+      _discountAmount = 2000; 
+      _appliedCoupon = 'FREEONGKIR';
+      notifyListeners();
+      return true;
     }
+    return false; // Kupon tidak valid
   }
 
-  bool isInCart(int productId) {
-    return _items.any((item) => item.product.id == productId);
+  void removeCoupon() {
+    _discountAmount = 0;
+    _appliedCoupon = null;
+    notifyListeners();
   }
 }

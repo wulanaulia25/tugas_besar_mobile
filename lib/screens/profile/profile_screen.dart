@@ -133,7 +133,7 @@ class ProfileScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              authProvider.logout(); // hapus await karena logout bukan async
+              authProvider.logout(); 
               if (context.mounted) {
                 context.go('/login');
               }
@@ -143,18 +143,17 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
+  } 
   void _showAboutDialog(BuildContext context) {
     showAboutDialog(
       context: context,
-      applicationName: 'Food Delivery App',
+      applicationName: 'Storely App',
       applicationVersion: '1.0.0',
-      applicationIcon: const Icon(Icons.restaurant, size: 48),
+      applicationIcon: const Icon(Icons.store, size: 48),
       children: const [
-        Text('Aplikasi pemesanan makanan dengan mudah dan cepat.'),
+        Text('aplikasi store yang sudah serba ada dan cari kebutuhan yang kalian cari.'),
         SizedBox(height: 16),
-        Text('Developed by: Wulan Aulia - RPL.2B'),
+        Text('Developed by: Kelompok 5 Pemrograman Mobile'),
       ],
     );
   }
