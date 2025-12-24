@@ -93,3 +93,4 @@ Anda bisa mendaftar akun baru di aplikasi, atau gunakan akun demo berikut (jika 
 * **NIM:** 2405007
 * **Kelas:** RPL - 2B
 * **Institusi:** Politeknik Negeri Indramayu (Polindra)
+
