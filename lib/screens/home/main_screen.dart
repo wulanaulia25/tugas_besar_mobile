@@ -13,8 +13,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-
-  // Hapus const, karena widget ini tidak bisa const
   final List<Widget> _screens = [
     HomeScreen(),
     OrderHistoryScreen(),

@@ -38,17 +38,9 @@ dependencies:
   # --- TUBES REQUIRED DEPENDENCIES ---
   # State Management
   provider: ^6.1.1
-
-  # HTTP Client
   dio: ^5.4.0
-
-  # Local Storage
   shared_preferences: ^2.2.2
-
-  # Navigation
   go_router: ^13.0.0
-
-  # UI Components
   google_fonts: ^6.1.0
 
   # Utils
@@ -78,7 +70,7 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
+  assets: []
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

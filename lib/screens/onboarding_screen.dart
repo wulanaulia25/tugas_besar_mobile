@@ -14,9 +14,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<OnboardingData> _pages = [
     OnboardingData(
-      title: 'Temukan Makanan Favorit',
-      description: 'Jelajahi ribuan pilihan makanan lezat dari restoran terbaik',
-      icon: Icons.restaurant_menu,
+      title: 'Temukan Barang Favorit Anda',
+      description: 'Jelajahi ribuan pilihan fashions dan barang yang kalian cari dengan kulitas terbaik',
+      icon: Icons.storefront,
     ),
     OnboardingData(
       title: 'Pesan dengan Mudah',

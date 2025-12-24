@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import 'help_page.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -73,8 +74,9 @@ class ProfileScreen extends StatelessWidget {
                   icon: Icons.help_outline,
                   title: 'Bantuan',
                   onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Fitur bantuan segera hadir')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HelpPage()),
                     );
                   },
                 ),
@@ -133,7 +135,7 @@ class ProfileScreen extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              authProvider.logout(); // hapus await karena logout bukan async
+              authProvider.logout(); 
               if (context.mounted) {
                 context.go('/login');
               }
@@ -143,18 +145,17 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
+  } 
   void _showAboutDialog(BuildContext context) {
     showAboutDialog(
       context: context,
-      applicationName: 'Food Delivery App',
+      applicationName: 'Storely App',
       applicationVersion: '1.0.0',
-      applicationIcon: const Icon(Icons.restaurant, size: 48),
+      applicationIcon: const Icon(Icons.store, size: 48),
       children: const [
-        Text('Aplikasi pemesanan makanan dengan mudah dan cepat.'),
+        Text('aplikasi store yang sudah serba ada dan cari kebutuhan yang kalian cari.'),
         SizedBox(height: 16),
-        Text('Developed by: Wulan Aulia - RPL.2B'),
+        Text('Developed by: Kelompok 5 Pemrograman Mobile'),
       ],
     );
   }

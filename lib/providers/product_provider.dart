@@ -31,7 +31,7 @@ class ProductProvider extends ChangeNotifier {
     return _products.where((p) => p.category == _selectedCategory).toList();
   }
 
-  // =============== FETCH PRODUCTS ===============
+  //kategori semua ditambahin di fetchCategories
   Future<void> fetchProducts() async {
     _state = ProductState.loading;
     notifyListeners();
@@ -47,18 +47,18 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  // =============== FETCH CATEGORIES ===============
+  // fetch categories from API
   Future<void> fetchCategories() async {
     try {
       _categories = await _apiService.getCategories();
-      _categories.insert(0, 'all'); // Add "all" category
+      _categories.insert(0, 'all'); 
       notifyListeners();
     } catch (e) {
       debugPrint('Error fetching categories: $e');
     }
   }
 
-  // =============== FETCH PRODUCT BY ID ===============
+  // fetch product by ID
   Future<void> fetchProductById(int id) async {
     _state = ProductState.loading;
     notifyListeners();
@@ -74,13 +74,13 @@ class ProductProvider extends ChangeNotifier {
     }
   }
 
-  // =============== SET CATEGORY FILTER ===============
+  // set selected category
   void setCategory(String? category) {
     _selectedCategory = category;
     notifyListeners();
   }
 
-  // =============== SEARCH PRODUCTS ===============
+  // search products
   List<ProductModel> searchProducts(String query) {
     if (query.isEmpty) return filteredProducts;
     

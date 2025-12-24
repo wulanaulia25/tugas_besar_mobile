@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +11,6 @@ import '../screens/auth/register_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
 
 import '../screens/home/main_screen.dart';
-import '../screens/home/home_screen.dart';
 
 import '../screens/product/product_detail_screen.dart';
 import '../screens/product/category_screen.dart';

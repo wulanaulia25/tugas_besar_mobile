@@ -12,8 +12,6 @@ class CartItemModel {
   });
 
   double get subtotal => product.price * quantity;
-
-  // Convert JSON to CartItemModel
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(
       product: ProductModel.fromJson(json['product']),
@@ -22,7 +20,6 @@ class CartItemModel {
     );
   }
 
-  // Convert CartItemModel to JSON
   Map<String, dynamic> toJson() {
     return {
       'product': product.toJson(),

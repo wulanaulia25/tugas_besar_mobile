@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -52,7 +53,7 @@ class FoodDeliveryApp extends StatelessWidget {
         builder: (context, themeProvider, child) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'Food Delivery App',
+            title: 'Storely App',
             routerConfig: AppRouter.router,
             theme: ThemeData(
               textTheme: GoogleFonts.poppinsTextTheme(),

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
 import '../models/user_model.dart';
-import 'dart:math';
 
 enum AuthState { idle, loading, success, error }
 
@@ -15,39 +15,50 @@ class AuthProvider extends ChangeNotifier {
   AuthState get state => _state;
   String get errorMessage => _errorMessage;
 
+  final String _mainUrl = 'https://694aa42826e8707720662769.mockapi.io/users';
+
+  final Dio _dio = Dio();
+
+  AuthProvider() {
+    _dio.options.connectTimeout = const Duration(seconds: 10);
+    _dio.options.receiveTimeout = const Duration(seconds: 10);
+  }
+
   /// LOGIN
   Future<bool> login(String email, String password, bool rememberMe) async {
     _state = AuthState.loading;
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 2)); // simulasi API
-
-      _isAuthenticated = true;
-
-      // Buat id acak untuk user
-      final randomId = Random().nextInt(100000).toString();
-
-      _currentUser = UserModel(
-        id: randomId,
-        name: "Pengguna Baru",
-        email: email,
-        phone: null,
-        address: null,
+      final response = await _dio.get(
+        _mainUrl,
+        queryParameters: {'email': email},
       );
 
-      // Simulasi "ingat saya"
-      if (rememberMe) {
-        // Contoh: simpan ke SharedPreferences
+      final List users = response.data;
+
+      if (users.isEmpty) {
+        _setError('Email tidak ditemukan. Silakan daftar.');
+        return false;
       }
 
-      _state = AuthState.success;
-      notifyListeners();
-      return true;
+      final userData = users.first;
+
+      if (userData['password'] == password) {
+        _isAuthenticated = true;
+        _currentUser = UserModel.fromJson(userData);
+        _state = AuthState.success;
+        notifyListeners();
+        return true;
+      } else {
+        _setError('Password salah.');
+        return false;
+      }
+    } on DioException catch (e) {
+      _handleDioError(e);
+      return false;
     } catch (e) {
-      _state = AuthState.error;
-      _errorMessage = e.toString();
-      notifyListeners();
+      _setError('Terjadi kesalahan: $e');
       return false;
     }
   }
@@ -58,32 +69,46 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 2)); // simulasi API register
-
-      // Buat id acak untuk user
-      final randomId = Random().nextInt(100000).toString();
-
-      _isAuthenticated = true;
-      _currentUser = UserModel(
-        id: randomId,
-        name: name,
-        email: email,
-        phone: null,
-        address: null,
+      final checkResponse = await _dio.get(
+        _mainUrl,
+        queryParameters: {'email': email},
       );
 
-      _state = AuthState.success;
-      notifyListeners();
-      return true;
+      if ((checkResponse.data as List).isNotEmpty) {
+        _setError('Email sudah terdaftar.');
+        return false;
+      }
+
+      final response = await _dio.post(
+        _mainUrl,
+        data: {
+          'name': name,
+          'email': email,
+          'password': password,
+          'phone': '',   
+          'address': '', 
+        },
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        _isAuthenticated = true;
+        _currentUser = UserModel.fromJson(response.data);
+        _state = AuthState.success;
+        notifyListeners();
+        return true;
+      } else {
+        _setError('Gagal mendaftar.');
+        return false;
+      }
+    } on DioException catch (e) {
+      _handleDioError(e);
+      return false;
     } catch (e) {
-      _state = AuthState.error;
-      _errorMessage = e.toString();
-      notifyListeners();
+      _setError('Terjadi kesalahan: $e');
       return false;
     }
   }
 
-  /// UPDATE PROFILE
   Future<bool> updateProfile({
     required String name,
     String? phone,
@@ -95,49 +120,74 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.delayed(const Duration(seconds: 1)); // simulasi API update
-
-      _currentUser = _currentUser!.copyWith(
-        name: name,
-        phone: phone,
-        address: address,
+      final id = _currentUser!.id;
+      final response = await _dio.put(
+        '$_mainUrl/$id',
+        data: {
+          'name': name,
+          'phone': phone,
+          'address': address,
+          'email': _currentUser!.email, 
+        },
       );
 
-      _state = AuthState.success;
-      notifyListeners();
-      return true;
+      if (response.statusCode == 200) {
+        _currentUser = UserModel.fromJson(response.data);
+        _state = AuthState.success;
+        notifyListeners();
+        return true;
+      } else {
+        _setError('Gagal update profile.');
+        return false;
+      }
+    } on DioException catch (e) {
+      _handleDioError(e);
+      return false;
     } catch (e) {
-      _state = AuthState.error;
-      _errorMessage = e.toString();
-      notifyListeners();
+      _setError('Terjadi kesalahan: $e');
       return false;
     }
   }
 
-  /// RESET PASSWORD
   Future<bool> resetPassword(String email) async {
     _state = AuthState.loading;
     notifyListeners();
-
     try {
-      await Future.delayed(const Duration(seconds: 2)); // simulasi API
-
-      _state = AuthState.success;
-      notifyListeners();
-      return true;
+      final response = await _dio.get(_mainUrl, queryParameters: {'email': email});
+      if ((response.data as List).isNotEmpty) {
+        _state = AuthState.success;
+        notifyListeners();
+        return true;
+      } else {
+        _setError('Email tidak ditemukan');
+        return false;
+      }
     } catch (e) {
-      _state = AuthState.error;
-      _errorMessage = e.toString();
-      notifyListeners();
+      _setError('Gagal memproses permintaan');
       return false;
     }
   }
 
-  /// LOGOUT
   void logout() {
     _isAuthenticated = false;
     _currentUser = null;
     _state = AuthState.idle;
     notifyListeners();
+  }
+
+  void _setError(String msg) {
+    _state = AuthState.error;
+    _errorMessage = msg;
+    notifyListeners();
+  }
+
+  void _handleDioError(DioException e) {
+    String msg = 'Terjadi kesalahan jaringan.';
+    if (e.type == DioExceptionType.badResponse) {
+       msg = 'Error Server: ${e.response?.statusCode}';
+    } else if (e.type == DioExceptionType.connectionError) {
+       msg = 'Tidak ada koneksi internet.';
+    }
+    _setError(msg);
   }
 }

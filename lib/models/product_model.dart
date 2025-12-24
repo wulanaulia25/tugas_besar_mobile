@@ -17,7 +17,6 @@ class ProductModel {
     required this.rating,
   });
 
-  /// Membuat instance dari JSON dengan parsing aman
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
       id: json['id'] is String
@@ -36,7 +35,6 @@ class ProductModel {
     );
   }
 
-  /// Mengubah instance menjadi JSON
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -59,7 +57,6 @@ class Rating {
     required this.count,
   });
 
-  /// Membuat instance dari JSON dengan aman
   factory Rating.fromJson(Map<String, dynamic> json) {
     return Rating(
       rate: json['rate'] != null
@@ -73,7 +70,6 @@ class Rating {
     );
   }
 
-  /// Mengubah instance menjadi JSON
   Map<String, dynamic> toJson() {
     return {
       'rate': rate,

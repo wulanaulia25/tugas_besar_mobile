@@ -1,4 +1,5 @@
 import 'cart_item_model.dart';
+import 'product_model.dart';
 
 class OrderModel {
   final String id;
@@ -24,16 +25,19 @@ class OrderModel {
   });
 
   OrderModel copyWith({
+    String? id,
     String? status,
     String? paymentMethod,
     String? deliveryAddress,
     String? deliveryNotes,
+    List<CartItemModel>? items,
+    double? totalAmount,
   }) {
     return OrderModel(
-      id: id,
+      id: id ?? this.id,
       userId: userId,
-      items: items,
-      totalAmount: totalAmount,
+      items: items ?? this.items,
+      totalAmount: totalAmount ?? this.totalAmount,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       status: status ?? this.status,
       createdAt: createdAt,
@@ -43,30 +47,70 @@ class OrderModel {
   }
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
+    final itemsData = json['items'] ?? json['products'];
+    List<CartItemModel> parsedItems = [];
+    
+    if (itemsData != null && itemsData is List) {
+      parsedItems = itemsData.map((item) {
+        if (item is Map<String, dynamic>) {
+          if (item.containsKey('title')) {
+             return CartItemModel.fromJson(item);
+          } 
+          else {
+            final productId = item['productId'] is String
+                ? int.tryParse(item['productId']) ?? 0
+                : (item['productId'] ?? 0);
+
+            return CartItemModel(
+              product: ProductModel(
+                id: productId,
+                title: item['title']?.toString() ?? 'Produk #$productId',
+                description: item['description']?.toString() ?? '',
+                price: item['price'] is String
+                    ? double.tryParse(item['price']) ?? 0.0
+                    : ((item['price'] as num?)?.toDouble() ?? 0.0),
+                category: item['category'] ?? 'Unknown',
+                image: item['image'] ?? 'https://via.placeholder.com/150',
+                rating: Rating(rate: 0.0, count: 0),
+              ),
+              quantity: item['quantity'] ?? 1,
+            );
+          }
+        }
+        return null;
+      })
+      .whereType<CartItemModel>()
+      .toList();
+    }
+
     return OrderModel(
-      id: json['id'].toString(),
-      userId: json['userId'].toString(),
-      items: (json['items'] as List<dynamic>)
-          .map((item) => CartItemModel.fromJson(item))
-          .toList(),
-      totalAmount: (json['totalAmount'] as num).toDouble(),
-      paymentMethod: json['paymentMethod'],
-      status: json['status'],
-      createdAt: DateTime.parse(json['createdAt']),
-      deliveryAddress: json['deliveryAddress'],
-      deliveryNotes: json['deliveryNotes'],
+      id: json['id']?.toString() ?? '',
+      userId: json['userId']?.toString() ?? '',
+      items: parsedItems,
+      totalAmount: (json['totalAmount'] as num?)?.toDouble() ?? 
+                   (json['total_amount'] as num?)?.toDouble() ?? 0.0,
+      paymentMethod: json['paymentMethod']?.toString() ?? 'Cash on Delivery',
+      status: json['status']?.toString() ?? 'Pending',
+      createdAt: json['date'] != null 
+          ? DateTime.parse(json['date']) 
+          : DateTime.now(),
+      deliveryAddress: json['deliveryAddress']?.toString() ?? '-',
+      deliveryNotes: json['deliveryNotes']?.toString(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
-      'userId': userId,
-      'items': items.map((e) => e.toJson()).toList(),
+      'userId': int.tryParse(userId) ?? 1,
+      'date': createdAt.toIso8601String(),
+      'products': items.map((e) => {
+        'productId': e.product.id,
+        'quantity': e.quantity
+      }).toList(),
+      'items': items.map((e) => e.toJson()).toList(), 
       'totalAmount': totalAmount,
       'paymentMethod': paymentMethod,
       'status': status,
-      'createdAt': createdAt.toIso8601String(),
       'deliveryAddress': deliveryAddress,
       'deliveryNotes': deliveryNotes,
     };

@@ -14,20 +14,26 @@ class OrderProvider extends ChangeNotifier {
 
   OrderProvider(this._apiService);
 
-  // Getters
   OrderState get state => _state;
   List<OrderModel> get orders => _orders;
   OrderModel? get currentOrder => _currentOrder;
   String get errorMessage => _errorMessage;
 
-  // =============== CREATE ORDER ===============
   Future<bool> createOrder(OrderModel order) async {
     _state = OrderState.loading;
     notifyListeners();
 
     try {
-      _currentOrder = await _apiService.createOrder(order);
+      await _apiService.createOrder(order);
+      final String uniqueLocalId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      _currentOrder = order.copyWith(
+        id: uniqueLocalId,
+        status: 'Pending',
+      );
+
       _orders.insert(0, _currentOrder!);
+      
       _state = OrderState.success;
       notifyListeners();
       return true;
@@ -39,13 +45,18 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  // =============== FETCH ORDERS ===============
-  Future<void> fetchOrders(String userId) async { // ubah int -> String
+  Future<void> fetchOrders(String userId) async {
+    if (_orders.isNotEmpty) return;
+
     _state = OrderState.loading;
     notifyListeners();
 
     try {
-      _orders = await _apiService.getOrders(userId); // sesuaikan API menerima String
+      final serverOrders = await _apiService.getOrders(userId);
+            if (_orders.isEmpty) {
+        _orders = serverOrders;
+      }
+      
       _state = OrderState.success;
       notifyListeners();
     } catch (e) {
@@ -55,7 +66,6 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  // =============== UPDATE ORDER STATUS (Local) ===============
   void updateOrderStatus(String orderId, String status) {
     final index = _orders.indexWhere((order) => order.id == orderId);
     if (index != -1) {
@@ -67,7 +77,6 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  // =============== CLEAR CURRENT ORDER ===============
   void clearCurrentOrder() {
     _currentOrder = null;
     notifyListeners();
